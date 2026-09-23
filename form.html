@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply - Seven Horses Manpower Pvt Ltd</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,system-ui,'Segoe UI',sans-serif;background:#08080A;color:#fff;font-size:14px;line-height:1.55;min-height:100vh;padding:16px;background-image:radial-gradient(circle at 15% -10%,rgba(232,184,106,.08) 0%,transparent 40%),radial-gradient(circle at 85% 100%,rgba(139,142,255,.06) 0%,transparent 40%);background-attachment:fixed}
+.container{max-width:480px;margin:0 auto}
+.brand{text-align:center;margin-bottom:24px;padding-top:20px}
+.brand h1{font-size:26px;color:#E8B86A;font-weight:800;letter-spacing:1px}
+.brand p{color:#888;font-size:12px;margin-top:4px}
+.card{background:rgba(255,255,255,.02);border:1px solid #1A1A1E;border-radius:16px;padding:20px;margin-bottom:16px}
+h2{font-size:18px;margin-bottom:6px;font-weight:700}
+.sub{color:#888;font-size:12px;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:#aaa;margin-bottom:6px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;padding:13px 15px;border-radius:12px;border:1px solid #232326;background:#0E0E10;color:#fff;font-size:14px;font-family:inherit;transition:all .2s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:rgba(232,184,106,.5);box-shadow:0 0 0 4px rgba(232,184,106,.08)}
+.field textarea{resize:vertical;min-height:80px}
+.field input::placeholder,.field textarea::placeholder{color:#52525b}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8B86A,#d4a555);color:#08080A;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-top:8px}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.err{background:#7f1d1d;color:#fff;padding:12px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none}
+.success{text-align:center;padding:40px 20px}
+.success .icon{font-size:60px;margin-bottom:16px}
+.success h2{color:#E8B86A;font-size:22px;margin-bottom:8px}
+.success p{color:#aaa;font-size:13px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="brand">
+        <h1>Seven Horses</h1>
+<p>Manpower Pvt Ltd</p>
+    </div>
+    
+    <div class="card" id="formCard">
+        <h2>Apply for Job</h2>
+        <p class="sub">Fill the form below. We'll contact you soon.</p>
+        
+        <div class="err" id="errBox"></div>
+        
+        <div class="field">
+            <label>Full Name *</label>
+            <input type="text" id="f_name" placeholder="Your name">
+        </div>
+        
+        <div class="row2">
+            <div class="field">
+                <label>Phone *</label>
+                <input type="tel" id="f_phone" placeholder="Phone">
+            </div>
+            <div class="field">
+                <label>Email *</label>
+                <input type="email" id="f_email" placeholder="Email">
+            </div>
+        </div>
+        
+        <div class="row2">
+            <div class="field">
+                <label>Qualification</label>
+                <input type="text" id="f_qual" placeholder="e.g. B.Com">
+            </div>
+            <div class="field">
+                <label>Job Profile</label>
+                <input type="text" id="f_jp" placeholder="e.g. Sales">
+            </div>
+        </div>
+        
+<div class="field">
+    <label>Skills (comma separated)</label>
+    <input type="text" id="f_skills" placeholder="e.g. Excel, Tally, Sales">
+</div>
+        <div class="field">
+            <label>Experience Type *</label>
+            <select id="f_exp" onchange="toggleExpFields(this.value)">
+                <option value="fresher">Fresher</option>
+                <option value="experience">Experience</option>
+            </select>
+        </div>
+        
+        <div id="expFields" class="hide">
+            <div class="field">
+                <label>Experience (years)</label>
+                <input type="number" id="f_expy" placeholder="e.g. 2">
+            </div>
+            <div class="row2">
+                <div class="field">
+                    <label>Last Salary</label>
+                    <input type="number" id="f_ls" placeholder="In Rs">
+                </div>
+                <div class="field">
+                    <label>Expected Salary</label>
+                    <input type="number" id="f_es" placeholder="In Rs">
+                </div>
+            </div>
+        </div>
+        
+        <div class="field">
+            <label>Location</label>
+            <input type="text" id="f_loc" placeholder="e.g. Delhi">
+        </div>
+        
+        <div class="field">
+            <label>Address</label>
+            <textarea id="f_addr" placeholder="Full address"></textarea>
+        </div>
+        
+        <button id="submitBtn" onclick="submitForm()">Submit Application</button>
+    </div>
+    
+    <div class="card success hide" id="successCard">
+        <div class="icon">✅</div>
+        <h2>Thank You!</h2>
+        <p>Your application has been submitted. We'll contact you soon.</p>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+var firebaseConfig = {
+    apiKey: "AIzaSyC0_uPBho9ZBW--FN_ZdxoRpmp1RukiwKM",
+    authDomain: "seven-horses-crm.firebaseapp.com",
+    projectId: "seven-horses-crm",
+    storageBucket: "seven-horses-crm.firebasestorage.app",
+    messagingSenderId: "139462163814",
+    appId: "1:139462163814:web:80de588cafc645a159dca7"
+};
+
+var fbDb = null;
+try {
+    firebase.initializeApp(firebaseConfig);
+    fbDb = firebase.firestore();
+} catch (e) {
+    console.error('Firebase init failed:', e);
+}
+
+function toggleExpFields(v) {
+    var el = document.getElementById('expFields');
+    if (!el) return;
+    if (v === 'experience') el.classList.remove('hide');
+    else el.classList.add('hide');
+}
+
+function showError(msg) {
+    var box = document.getElementById('errBox');
+    box.textContent = msg;
+    box.style.display = 'block';
+    window.scrollTo(0, 0);
+}
+
+function hideError() {
+    document.getElementById('errBox').style.display = 'none';
+}
+
+function submitForm() {
+    hideError();
+    
+    var name = document.getElementById('f_name').value.trim();
+    var phone = document.getElementById('f_phone').value.trim();
+    var email = document.getElementById('f_email').value.trim();
+    var expType = document.getElementById('f_exp').value;
+    
+    if (!name) return showError('Please enter your full name');
+    if (!phone) return showError('Please enter your phone number');
+    if (phone.length < 10) return showError('Please enter a valid phone number');
+    if (!email) return showError('Please enter your email');
+    if (email.indexOf('@') === -1) return showError('Please enter a valid email');
+    var location = document.getElementById('f_loc').value.trim();
+var address = document.getElementById('f_addr').value.trim();
+
+if (!location) return showError('Please enter your location');
+if (!address) return showError('Please enter your address');
+
+if (expType === 'experience') {
+    var expy = document.getElementById('f_expy').value.trim();
+    if (!expy) return showError('Please enter your experience in years');
+}
+
+    if (!fbDb) return showError('Connection error. Please try again.');
+    
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+    
+    fbDb.collection('crm').doc('data').get()
+.then(function(doc) {
+    var existing = doc.exists ? (doc.data().candidates || []) : [];
+    for (var i = 0; i < existing.length; i++) {
+        if (!existing[i].isDeleted && existing[i].phone === phone) {
+            throw new Error('This phone number is already registered');
+        }
+        if (!existing[i].isDeleted && existing[i].email === email) {
+            throw new Error('This email is already registered');
+        }
+    }
+    return fbDb.collection('candidates_pending').where('phone', '==', phone).limit(1).get();
+})
+.then(function(snap) {
+    if (!snap.empty) {
+        throw new Error('This phone number is already registered');
+    }
+    return fbDb.collection('candidates_pending').where('email', '==', email).limit(1).get();
+})
+.then(function(snap) {
+    if (!snap.empty) {
+        throw new Error('This email is already registered');
+    }
+        
+        var c = {
+            name: name,
+            phone: phone,
+            email: email,
+            qualification: document.getElementById('f_qual').value.trim(),
+            jobProfile: document.getElementById('f_jp').value.trim(),
+            experienceType: expType,
+            experience: expType === 'experience' ? document.getElementById('f_expy').value : '',
+            lastSalary: expType === 'experience' ? document.getElementById('f_ls').value : '',
+            expectedSalary: expType === 'experience' ? document.getElementById('f_es').value : '',
+            location: document.getElementById('f_loc').value.trim(),
+            address: document.getElementById('f_addr').value.trim(),
+          skills: document.getElementById('f_skills').value.trim(),
+            status: 'applied',
+            source: 'public_form',
+          processed: false,
+            isDeleted: false,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        
+        return fbDb.collection('candidates_pending').add(c);
+    })
+    .then(function() {
+        document.getElementById('formCard').classList.add('hide');
+        document.getElementById('successCard').classList.remove('hide');
+        window.scrollTo(0, 0);
+    })
+    .catch(function(e) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Application';
+        showError(e.message || 'Something went wrong. Please try again.');
+    });
+}
+</script>
+</body>
+</html>
